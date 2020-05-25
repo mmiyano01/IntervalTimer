@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+            android:id="@+id/action_thirty_sec"
+            android:title="@string/action_thirty_sec"
+            app:showAsAction="never"/>
+    <item
+            android:id="@+id/action_one_min"
+            android:title="@string/action_one_min"
+            app:showAsAction="never"/>
+    <item
+            android:id="@+id/action_two_min"
+            android:title="@string/action_two_min"
+            app:showAsAction="never"/>
+    <item
+            android:id="@+id/action_three_min"
+            android:title="@string/action_three_min"
+            app:showAsAction="never"/>
+    <item
+            android:id="@+id/action_four_min"
+            android:title="@string/action_four_min"
+            app:showAsAction="never"/>
+    <item
+            android:id="@+id/action_five_min"
+            android:title="@string/action_five_min"
+            app:showAsAction="never"/>
+    <item
+            android:id="@+id/action_six_min"
+            android:title="@string/action_six_min"
+            app:showAsAction="never"/>
+    <item
+            android:id="@+id/action_seven_min"
+            android:title="@string/action_seven_min"
+            app:showAsAction="never"/>
+    <item
+            android:id="@+id/action_eight_min"
+            android:title="@string/action_eight_min"
+            app:showAsAction="never"/>
+
+    <item
+            android:id="@+id/action_nine_min"
+            android:title="@string/action_nine_min"
+            app:showAsAction="never"/>
+
+    <item
+            android:id="@+id/action_ten_min"
+            android:title="@string/action_ten_min"
+            app:showAsAction="never"/>
+
+</menu>

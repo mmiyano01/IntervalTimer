@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Randori Timer</string>
+
+    <string name="action_break_time_settings">Change Break Time</string>
+    <string name="action_work_time_settings">Change Work Time</string>
+    <string name="action_thirty_sec">30 sec</string>
+    <string name="action_one_min">1 min</string>
+    <string name="action_two_min">2 min</string>
+    <string name="action_three_min">3 min</string>
+    <string name="action_four_min">4 min</string>
+    <string name="action_five_min">5 min</string>
+    <string name="action_six_min">6 min</string>
+    <string name="action_seven_min">7 min</string>
+    <string name="action_eight_min">8 min</string>
+    <string name="action_nine_min">9 min</string>
+    <string name="action_ten_min">10 min</string>
+    <string name="set">Set</string>
+    <string name="cancel">Cancel</string>
+    <string name="min">min</string>
+    <string name="sec">sec</string>
+
+
+</resources>
