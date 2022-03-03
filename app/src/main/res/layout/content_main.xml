@@ -14,7 +14,7 @@
             android:layout_marginLeft="18dp"
             android:layout_marginEnd="17dp"
             android:layout_marginRight="17dp"
-            android:layout_marginBottom="28dp"
+            android:layout_marginBottom="72dp"
             android:text="@string/action_work_time_settings"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -26,11 +26,34 @@
             android:id="@+id/break_time_settings_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="28dp"
+            android:layout_marginBottom="72dp"
             android:text="@string/action_break_time_settings"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/work_time_settings_button" />
+
+    <Button
+            android:id="@+id/metronome_settings_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="36dp"
+            android:layout_marginLeft="36dp"
+            android:layout_marginTop="56dp"
+            android:text="Metronome"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/work_time_settings_button" />
+
+    <Switch
+            android:id="@+id/metoronome_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="80dp"
+            android:layout_marginLeft="80dp"
+            android:layout_marginTop="56dp"
+            android:minHeight="48dp"
+            android:text="Metronome "
+            app:layout_constraintStart_toEndOf="@+id/metronome_settings_button"
+            app:layout_constraintTop_toTopOf="@+id/break_time_settings_button" />
 
 
 </android.support.constraint.ConstraintLayout>

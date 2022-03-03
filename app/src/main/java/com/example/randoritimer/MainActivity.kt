@@ -1,7 +1,7 @@
 package com.example.randoritimer
 
 import android.app.AlertDialog
-import android.app.Dialog
+import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -10,24 +10,18 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.WindowManager
 import android.widget.*
-import android.view.LayoutInflater
-import android.support.v4.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.widget.NumberPicker
-import android.support.v4.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-import kotlinx.android.synthetic.main.number_picker_dialog.*
-import android.support.v4.app.SupportActivity
-import android.support.v4.app.SupportActivity.ExtraData
-import android.support.v4.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import android.media.AudioManager
 
-
+import android.media.SoundPool
+import android.os.Build
+import android.support.annotation.RequiresApi
 
 
 class MainActivity : AppCompatActivity() {
     var context = this;
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -45,15 +39,42 @@ class MainActivity : AppCompatActivity() {
         var stop_button = findViewById<Button>(R.id.stop_button)
         var work_time_settings_button = findViewById<Button>(R.id.work_time_settings_button)
         var break_time_settings_button = findViewById<Button>(R.id.break_time_settings_button)
+        var metronome_settings_button = findViewById<Button>(R.id.metronome_settings_button)
+        val metronomeSwitch: Switch = findViewById(R.id.metoronome_switch)
 
-        val mp = MediaPlayer.create (this, R.raw.whistle)
+        val audioAttributes = AudioAttributes.Builder()
+            // USAGE_MEDIA
+            // USAGE_GAME
+            .setUsage(AudioAttributes.USAGE_GAME)
+            // CONTENT_TYPE_MUSIC
+            // CONTENT_TYPE_SPEECH, etc.
+            .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+            .build()
+
+        var soundPool = SoundPool.Builder()
+            .setAudioAttributes(audioAttributes)
+            .setMaxStreams(3)
+            .build()
+
+        var soundBuzzer = soundPool.load(this, R.raw.buzzer, 1)
+        var soundBeep = soundPool.load(this, R.raw.beep, 1)
+        var soundTimeLimit = soundPool.load(this, R.raw.beep5, 1)
+
+        //val buzzer_mp = MediaPlayer.create (this, R.raw.buzzer)
+        //val beep_mp = MediaPlayer.create (this, R.raw.beep6)
+        //val timelimit_mp = MediaPlayer.create (this, R.raw.beep)
+
 
         var timer_running = false
         var timer_paused = false
         var timer_stopped = false
         var pre_timer_running = false
+        var metronome_running = false
+        var metronome_stopped = false
+
         var timer_max_sec = 60
         var break_time_max_sec = 25
+        var metronome_time_sec = 2.0
         cercled_progress_bar.setMax(timer_max_sec)
         break_cercled_progress_bar.setMax(break_time_max_sec)
 
@@ -81,9 +102,13 @@ class MainActivity : AppCompatActivity() {
                         break_time_num += 1
 
                         val count_down_num = break_time_max_sec + 1 - break_time_num
+                        if(count_down_num <= 5)
+                        {
+                            //timelimit_mp.start()
+                            soundPool.play(soundTimeLimit, 1.0f, 1.0f, 0, 0, 1.0f)
+                        }
                         break_cercled_progress_bar.setProgress(break_time_num, true)
                         center_text.text = "$count_down_num"
-
                     } else {
                         time_num += 1
 
@@ -94,7 +119,9 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun onFinish() {
-                    mp.start()
+                    //buzzer_mp.start()
+                    soundPool.play(soundBuzzer, 1.0f, 1.0f, 0, 0, 1.0f)
+
                     if (breaking) {
                         breaking = false
                         break_cercled_progress_bar.visibility = GONE
@@ -129,6 +156,8 @@ class MainActivity : AppCompatActivity() {
                     pre_timer_running = false
                     this.cancel()
                 } else {
+                    //timelimit_mp.start()
+                    soundPool.play(soundTimeLimit, 1.0f, 1.0f, 0, 0, 1.0f)
                     pre_time_num += 1
                     val count_down_num = 6 - pre_time_num
                     pre_cercled_progress_bar.setProgress(pre_time_num)
@@ -137,7 +166,8 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onFinish() {
-                mp.start()
+                //buzzer_mp.start()
+                soundPool.play(soundBuzzer, 1.0f, 1.0f, 0, 0, 1.0f)
                 pre_cercled_progress_bar.visibility = GONE
                 cercled_progress_bar.visibility = VISIBLE
                 pre_time_num = 0
@@ -147,6 +177,26 @@ class MainActivity : AppCompatActivity() {
                 timer((timer_max_sec * 1000).toLong(),1000).start()
             }
         }
+
+        fun metronome(millisInFuture:Long,countDownInterval:Long):CountDownTimer{
+            return object :
+                CountDownTimer(9223372036854775807, countDownInterval) {
+                override fun onTick(millisUntilFinished: Long) {
+                    if (metronome_stopped) {
+                        metronome_running = false
+                        this.cancel()
+                    } else {
+                        //beep_mp.start()
+                        soundPool.play(soundBeep, 1.0f, 1.0f, 0, 0, 1.0f)
+                    }
+                }
+
+                override fun onFinish() {
+                    this.start()
+                }
+            }
+        }
+
 
         start_button.setOnClickListener({
             timer_stopped = false
@@ -393,7 +443,51 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        metronome_settings_button.setOnClickListener {
+            val dialogBuilder = AlertDialog.Builder(this)
+            val inflater = this.layoutInflater
+            val dialogView = inflater.inflate(R.layout.metronome_number_picker_dialog, null)
+            dialogBuilder.setView(dialogView)
+            val alertDialog = dialogBuilder.create()
+            alertDialog.show()
 
+            val metronomePickerVales = arrayOf("5.0", "4.5", "4.0", "3.5", "3.0", "2.5", "2.0", "1.5" , "1.0", "0.5")
+            var set_metronome_sec = metronome_time_sec.toString()
+            val metronomeNumberPicker = alertDialog.findViewById(R.id.metronomeNumberPicker) as NumberPicker
+            metronomeNumberPicker.minValue = 0
+            metronomeNumberPicker.maxValue = metronomePickerVales.size - 1
+            metronomeNumberPicker.wrapSelectorWheel = false
+            metronomeNumberPicker.displayedValues = metronomePickerVales
+            metronomeNumberPicker.value = metronomePickerVales.indexOf(set_metronome_sec)
+
+            metronomeNumberPicker.setOnValueChangedListener { _, _, newVal ->
+                set_metronome_sec =  metronomePickerVales[newVal]
+            }
+
+            val set_time_button = alertDialog.findViewById(R.id.set_metronome_time_button) as Button
+
+            set_time_button.setOnClickListener{
+                //Toast.makeText(applicationContext,set_metronome_sec.toString(),Toast.LENGTH_SHORT).show()
+                metronome_time_sec = set_metronome_sec.toDouble()
+                alertDialog.hide()
+            }
+
+            val cancel_button = alertDialog.findViewById(R.id.metronome_cancel_button) as Button
+
+            cancel_button.setOnClickListener{
+                alertDialog.hide()
+            }
+        }
+
+        metronomeSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                metronome_stopped = false
+                metronome_running = true
+                metronome(9223372036854775807,(metronome_time_sec * 1000).toLong()).start()
+            } else {
+                metronome_stopped = true
+            }
+        }
     }
 
     fun time_formatter(time_in_sec: Int): String {
