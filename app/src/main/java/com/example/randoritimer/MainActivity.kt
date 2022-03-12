@@ -28,7 +28,9 @@ class MainActivity : AppCompatActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         var center_text = findViewById<TextView>(R.id.center_text)
-        var mode_text = findViewById<TextView>(R.id.mode_text)
+        var worktime_text = findViewById<TextView>(R.id.worktime_text)
+        var breaktime_text = findViewById<TextView>(R.id.breaktime_text)
+
 
         var pre_cercled_progress_bar = findViewById<ProgressBar>(R.id.pre_circled_progressbar)
         var cercled_progress_bar = findViewById<ProgressBar>(R.id.circled_progressbar)
@@ -88,7 +90,8 @@ class MainActivity : AppCompatActivity() {
         var breaking = false
         var work_completed = false
 
-        mode_text.text = "$timer_max_sec"
+        worktime_text.text = "$timer_max_sec"
+        breaktime_text.text = "$break_time_max_sec"
 
         fun timer(millisInFuture:Long,countDownInterval:Long):CountDownTimer{
             return object: CountDownTimer(millisInFuture, 1000) {
@@ -199,19 +202,21 @@ class MainActivity : AppCompatActivity() {
 
 
         start_button.setOnClickListener({
-            timer_stopped = false
-            if (!timer_running) {
-                cercled_progress_bar.visibility = GONE
-                pre_cercled_progress_bar.visibility = VISIBLE
-                pre_timer_running = true
-                pre_cercled_progress_bar.setMax(5)
-                pre_timer.start()
-            } else if (timer_paused) {
-                timer_paused = false
-                if (breaking) {
-                    timer(((break_time_max_sec - break_time_num) * 1000).toLong(),1000).start()
-                } else {
-                    timer(((timer_max_sec - time_num) * 1000).toLong(),1000).start()
+            if(!pre_timer_running) {
+                timer_stopped = false
+                if (!timer_running) {
+                    cercled_progress_bar.visibility = GONE
+                    pre_cercled_progress_bar.visibility = VISIBLE
+                    pre_timer_running = true
+                    pre_cercled_progress_bar.setMax(5)
+                    pre_timer.start()
+                } else if (timer_paused) {
+                    timer_paused = false
+                    if (breaking) {
+                        timer(((break_time_max_sec - break_time_num) * 1000).toLong(), 1000).start()
+                    } else {
+                        timer(((timer_max_sec - time_num) * 1000).toLong(), 1000).start()
+                    }
                 }
             }
         })
@@ -224,6 +229,7 @@ class MainActivity : AppCompatActivity() {
                 pre_cercled_progress_bar.setProgress(5,true)
                 pre_time_num = 0
                 center_text.text = "READY"
+                pre_timer_running = false
             }
         })
 
@@ -232,6 +238,7 @@ class MainActivity : AppCompatActivity() {
                 timer_stopped = true
             } else if (pre_timer_running) {
                 pre_timer.cancel()
+                pre_timer_running = false
             }
             cercled_progress_bar.visibility = GONE
             break_cercled_progress_bar.visibility = GONE
@@ -314,7 +321,7 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         set_sec_text = set_sec.toString()
                     }
-                    mode_text.text = set_min.toString() + ":" + set_sec_text
+                    worktime_text.text = set_min.toString() + ":" + set_sec_text
                     cercled_progress_bar.setMax(timer_max_sec)
                     alertDialog.hide()
                 }
@@ -361,7 +368,7 @@ class MainActivity : AppCompatActivity() {
                         R.id.action_ten_min ->
                             timer_max_sec = 600
                     }
-                    mode_text.text = item.title
+                    worktime_text.text = item.title
                     cercled_progress_bar.setMax(timer_max_sec)
                     true
                 })
@@ -427,6 +434,7 @@ class MainActivity : AppCompatActivity() {
                         set_sec_text = set_sec.toString()
                     }
                     break_cercled_progress_bar.setMax(break_time_max_sec)
+                    breaktime_text.text = set_min.toString() + ":" + set_sec_text
                     alertDialog.hide()
                 }
 
@@ -435,8 +443,6 @@ class MainActivity : AppCompatActivity() {
                 cancel_button.setOnClickListener{
                     alertDialog.hide()
                 }
-
-
             }
             else{
                 Toast.makeText(applicationContext,"Break time cannot be changed while timer is running.",Toast.LENGTH_SHORT).show()
